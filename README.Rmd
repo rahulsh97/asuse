@@ -39,9 +39,34 @@ Here is how to get the ASUSE database ready for use:
 asuse_download()
 ```
 
-TODO: Add example similar to ASI.
+Check the proportion of rural and urban companies in the survey (See https://microdata.gov.in/NADA/index.php/catalog/238/data-dictionary/F17?file_name=LEVEL%20-%2001(Block%201%20&%20item%201503,%201508%20of%20Block%2015)):
+
+```{r avg_sector}
+library(dplyr)
+library(duckdb)
+
+con <- dbConnect(duckdb(), asuse_file_path())
+
+dbListTables(con)
+
+tbl(con, "2023-24-level01") %>%
+  count(sector) %>%
+  mutate(
+    sector = case_when(
+      sector == 1L ~ "Rural",
+      sector == 2L ~ "Urban",
+      TRUE ~ NA_character_
+    ),
+    pct = n / sum(n)
+  ) %>%
+  collect()
+
+dbDisconnect(con, shutdown = TRUE)
+```
 
 # Adding older/newer years
+
+Microdata: https://microdata.gov.in/NADA/index.php/catalog/238/get-microdata
 
 1. Install the Nesstar Explorer (e.g. ASUSE 2023-24 includes it)
 2. Extract the RAR files downloaded from the microdata website to data-raw/202223 or what year you are adding

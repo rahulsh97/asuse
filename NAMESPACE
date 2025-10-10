@@ -3,3 +3,4 @@
 export(asuse_delete)
 export(asuse_download)
 export(asuse_file_path)
+export(available_datasets)
