@@ -7,7 +7,7 @@
 \format{
 A string vector
 
-An object of class \code{character} of length 1.
+An object of class \code{character} of length 3.
 }
 \usage{
 available_datasets
