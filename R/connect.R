@@ -1,3 +1,5 @@
+#' Internal function to get ASUSE path
+#' @keywords internal
 asuse_path <- function() {
   sys_asuse_path <- Sys.getenv("ASUSE_PATH")
   sys_asuse_path <- gsub("\\\\", "/", sys_asuse_path)
