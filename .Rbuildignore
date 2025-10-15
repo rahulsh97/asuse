@@ -6,3 +6,4 @@
 ^\.git$
 ^data-tidy$
 ^data-raw$
+^\.github$

@@ -4,6 +4,10 @@ output: github_document
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/rahulsh97/asuse/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rahulsh97/asuse/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -69,7 +73,7 @@ dbDisconnect(con, shutdown = TRUE)
 Microdata: https://microdata.gov.in/NADA/index.php/catalog/238/get-microdata
 
 1. Install the Nesstar Explorer (e.g. ASUSE 2023-24 includes it)
-2. Extract the RAR files downloaded from the microdata website to data-raw/202223 or what year you are adding
+2. Extract the RAR files downloaded from the microdata website to data-raw/202324 or what year you are adding
 3. Export the .Nesstar file to Stata (SAV) format with "Export Datasets" and the metadata with "Export DDI" using the Nesstar Explorer
 4. Update `00-tidy-data.r` and run it
 5. Update the available datasets in `R/available_datasets.R`
