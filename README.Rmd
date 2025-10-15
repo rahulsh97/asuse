@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# asuse
+# Annual Survey of Unincorporated Sector Enterprises (ASUSE)
 
 The goal of asuse is to provide a long dataset of the Annual Survey of Unincorporated Sector Enterprises (ASUSE) from India.
 

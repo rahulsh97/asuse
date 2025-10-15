@@ -6,7 +6,7 @@
 [![R-CMD-check](https://github.com/rahulsh97/asuse/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rahulsh97/asuse/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-# asuse
+# Annual Survey of Unincorporated Sector Enterprises (ASUSE)
 
 The goal of asuse is to provide a long dataset of the Annual Survey of
 Unincorporated Sector Enterprises (ASUSE) from India.
