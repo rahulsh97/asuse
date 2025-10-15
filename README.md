@@ -1,6 +1,11 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+<!-- badges: start -->
+
+[![R-CMD-check](https://github.com/rahulsh97/asuse/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rahulsh97/asuse/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
 # asuse
 
 The goal of asuse is to provide a long dataset of the Annual Survey of
@@ -83,7 +88,7 @@ Microdata:
 
 1.  Install the Nesstar Explorer (e.g. ASUSE 2023-24 includes it)
 2.  Extract the RAR files downloaded from the microdata website to
-    data-raw/202223 or what year you are adding
+    data-raw/202324 or what year you are adding
 3.  Export the .Nesstar file to Stata (SAV) format with “Export
     Datasets” and the metadata with “Export DDI” using the Nesstar
     Explorer
