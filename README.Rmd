@@ -1,0 +1,140 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/rahulsh97/asuse/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rahulsh97/asuse/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# Annual Survey of Unincorporated Sector Enterprises (ASUSE)
+
+The goal of asuse is to provide a long dataset of the Annual Survey of Unincorporated Sector Enterprises (ASUSE) from India.
+
+## Example
+
+Install the package from GitHub and load it:
+
+```{r install, eval=FALSE}
+# install.packages("devtools")
+devtools::install_github("rahulsh97/asuse")
+```
+
+```{r load}
+library(asuse)
+```
+
+Because of the datasets size, the package provides a function to download the datasets and create a local DuckDB
+database. This results in a CRAN-compliant package.
+
+Here is how to get the ASUSE database ready for use:
+
+```{r download, eval=FALSE}
+asuse_download()
+```
+
+Check the proportion of rural and urban companies in the survey (See https://microdata.gov.in/NADA/index.php/catalog/238/data-dictionary/F17?file_name=LEVEL%20-%2001(Block%201%20&%20item%201503,%201508%20of%20Block%2015)):
+
+```{r avg_sector}
+library(dplyr)
+library(duckdb)
+
+con <- dbConnect(duckdb(), asuse_file_path())
+
+dbListTables(con)
+
+tbl(con, "2023-24-level01") %>%
+  distinct(district) %>%
+  arrange() %>%
+  pull()
+
+tbl(con, "2023-24-level01") %>%
+  count(sector) %>%
+  mutate(
+    sector = case_when(
+      sector == 1L ~ "Rural",
+      sector == 2L ~ "Urban",
+      TRUE ~ NA_character_
+    ),
+    pct = n / sum(n)
+  ) %>%
+  collect()
+
+dbDisconnect(con, shutdown = TRUE)
+```
+
+Create a map showing the proportion of rural companies per region:
+
+```{r avg_rural, fig.width=7, fig.height=7}
+library(sf)
+library(stringr)
+library(ggplot2)
+
+con <- dbConnect(duckdb(), asuse_file_path())
+
+dbListTables(con)
+
+# average day of manufacturing days per region
+# README_ASUSE_2324%20.pdf: the State code can be derived from the field ‘NSS-Region’ (first 2 digits) 
+mean_rural <- tbl(con, "2023-24-level01") %>%
+  mutate(
+    sector = case_when(
+      sector == 1L ~ "Rural",
+      sector == 2L ~ "Urban",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  mutate(
+    nss_region = as.integer(substr(district, 1, 2))
+  ) %>%
+  count(nss_region, sector) %>%
+  group_by(nss_region) %>%
+  mutate(pct = n / sum(n)) %>%
+  filter(sector == "Rural") %>%
+  collect()
+
+dbDisconnect(con, shutdown = TRUE)
+
+# merge data with map of India states
+
+india_states <- readRDS("region-codes/india_states_map.rds")
+
+mean_rural <- mean_rural %>%
+  mutate(nss_region = str_pad(nss_region, width = 2, side = "left", pad = "0")) %>%
+  left_join(india_states, by = c("nss_region" = "state_code"))
+
+ggplot(mean_rural) +
+  geom_sf(aes(fill = pct, geometry = geometry), colour = "grey30", size = 0.2) +
+  scale_fill_viridis_c(option = "D", begin = 0.5, end = 0.8, na.value = "grey95", name = "Avg expenditure") +
+  labs(title = "Proportion of rural enterprises per region (ASUSE)") +
+  theme_minimal() +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    legend.position = "top"
+  )
+```
+
+# Adding older/newer years
+
+Microdata: https://microdata.gov.in/NADA/index.php/catalog/238/get-microdata
+
+1. Install the Nesstar Explorer (e.g. ASUSE 2023-24 includes it)
+2. Extract the RAR files downloaded from the microdata website to data-raw/202324 or what year you are adding
+3. Export the .Nesstar file to Stata (SAV) format with "Export Datasets" and the metadata with "Export DDI" using the Nesstar Explorer
+4. Update `00-tidy-data.r` and run it
+5. Update the available datasets in `R/available_datasets.R`
+6. Update the new RDS files in the 'Releases' section of the GitHub repository
+7. Regenerate the database with `asuse_delete()` and `asuse_download()`
