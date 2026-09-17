@@ -2,7 +2,7 @@
 % Please edit documentation in R/download.r
 \name{asuse_download}
 \alias{asuse_download}
-\title{Download the Annual Survey of Industries database from GitHub (2019-2023)}
+\title{Download the Annual Survey of Unincorporated Sector Enterprises database from GitHub (2021-22 to 2023-24)}
 \usage{
 asuse_download(ver = NULL)
 }

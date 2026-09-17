@@ -7,8 +7,8 @@
 asuse_file_path(dir = asuse_path())
 }
 \arguments{
-\item{dir}{Path to the ASUSE directory on disk. By default this is #' "asuse" inside the user's R data directory, or the
-directory specified by the \code{ASUSE_DIR} environment variable if set.}
+\item{dir}{Path to the ASUSE directory on disk. By default this is "asuse" inside the user's R data directory, or the
+directory specified by the \code{ASUSE_PATH} environment variable if set.}
 }
 \description{
 Returns the path to the local ASUSE database directory.
