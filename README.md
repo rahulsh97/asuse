@@ -115,9 +115,37 @@ dbDisconnect(con, shutdown = TRUE)
 ```
 
 A second example, mapping the proportion of rural enterprises by
-region, uses the boundary file in `region-codes/`; see that directory
-before relying on it, as its own provenance is not yet documented in
-this repository.
+region, uses the boundary file in `region-codes/`.
+
+## Map geometry
+
+The package includes a boundary layer for India’s states and union
+territories, used for mapping survey results geographically.
+`region-codes/build_india_map.R` documents how it is built, and
+`region-codes/MAP_SOURCE.md` has the full source and licence details.
+
+``` r
+library(sf)
+library(ggplot2)
+
+india_states <- readRDS("region-codes/india_states_map.rds")
+
+ggplot(india_states) +
+  geom_sf(fill = "grey85", colour = "grey40", linewidth = 0.2) +
+  theme_minimal(base_size = 13) +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    plot.title = element_text(hjust = 0.5, face = "bold")
+  ) +
+  labs(title = "States and union territories covered by this package")
+```
+
+<img src="man/figures/README-india_map-1.png" width="100%" />
+
+Map geometry: SimpleMaps, used under CC BY 4.0; package-specific data
+and visualisation by Rahul Shukla.
 
 ## Adding older or newer years
 
