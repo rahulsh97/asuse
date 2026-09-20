@@ -1,4 +1,3 @@
-#' This and the next function are used to print messages in the console
 #' @keywords internal
 msg <- function(..., startup = FALSE) {
   if (startup) {

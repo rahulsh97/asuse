@@ -8,8 +8,16 @@
 \description{
 Microdata from the Annual Survey of Unincorporated Sector Enterprises (ASUSE) conducted by the National Sample Survey Office (NSSO), Ministry of Statistics and Programme Implementation, Government of India. Tidied and organized using DuckDB for efficient querying.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/rahulsh97/asuse}
+  \item Report bugs at \url{https://github.com/rahulsh97/asuse/issues}
+}
+
+}
 \author{
-\strong{Maintainer}: First Last \email{first.last@example.com}
+\strong{Maintainer}: Rahul Shukla \email{rahulshuklakrc@gmail.com}
 
 }
 \keyword{internal}

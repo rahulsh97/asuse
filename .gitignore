@@ -1,0 +1,19 @@
+# local ASUSE DuckDB database created by asuse_download() / asuse_file_path()
+asuse_duckdb_v*.sql
+
+# raw microdata staged locally when adding a new survey year (see README)
+data-raw/
+
+# R session and project files
+.Rhistory
+.RData
+.Rproj.user/
+*.Rproj
+
+# package build artifacts
+/*.Rcheck/
+*.tar.gz
+
+# OS
+.DS_Store
+Thumbs.db

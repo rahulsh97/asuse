@@ -1,4 +1,3 @@
-#' Internal function to get ASUSE path
 #' @keywords internal
 asuse_path <- function() {
   sys_asuse_path <- Sys.getenv("ASUSE_PATH")
@@ -14,8 +13,8 @@ asuse_path <- function() {
 #'
 #' Returns the path to the local ASUSE database directory.
 #'
-#' @param dir Path to the ASUSE directory on disk. By default this is #' "asuse" inside the user's R data directory, or the
-#' directory specified by the `ASUSE_DIR` environment variable if set.
+#' @param dir Path to the ASUSE directory on disk. By default this is "asuse" inside the user's R data directory, or the
+#' directory specified by the `ASUSE_PATH` environment variable if set.
 #'
 #' @export
 #'

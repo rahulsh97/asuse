@@ -1,4 +1,4 @@
-#' Download the Annual Survey of Industries database from GitHub (2019-2023)
+#' Download the Annual Survey of Unincorporated Sector Enterprises database from GitHub (2021-22 to 2023-24)
 #'
 #' This function downloads the database from GitHub and creates a local database (DuckDB) with the data. These
 #' datasets cannot be included in the package due to their size and CRAN file size limits.

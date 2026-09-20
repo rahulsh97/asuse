@@ -1,80 +1,103 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+<!-- After editing, regenerate README.md with devtools::build_readme() -->
 
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/rahulsh97/asuse/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rahulsh97/asuse/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-# Annual Survey of Unincorporated Sector Enterprises (ASUSE)
+# asuse
 
-The goal of asuse is to provide a long dataset of the Annual Survey of
-Unincorporated Sector Enterprises (ASUSE) from India.
+asuse is an R package that turns India’s Annual Survey of
+Unincorporated Sector Enterprises (ASUSE) microdata into a single,
+tidy, queryable database, so you do not have to clean and merge
+multiple years of survey files yourself before you can start
+analysing them.
 
-## Example
+## Who this is for
 
-Install the package from GitHub and load it:
+Researchers, students, and analysts working in R who need ASUSE
+enterprise-level data on India’s unincorporated (informal)
+non-agricultural sector joined into one place and queryable with
+ordinary dplyr or SQL code.
+
+## What data this supports
+
+The package currently covers the ASUSE survey years listed in
+`available_datasets`: 2021-22 through 2023-24. Each year’s
+enterprise-level blocks are included once added to the underlying
+database.
+
+## What the package does and does not download or redistribute
+
+- The package itself ships **no ASUSE microdata**. It ships only R
+  code, the list of available survey years, and a small amount of
+  public reference material (Indian state boundaries in
+  `region-codes/`) used to work with the data once you have it.
+- `asuse_download()` fetches a maintainer-prepared, tidied DuckDB
+  database from this repository’s [GitHub
+  Releases](https://github.com/rahulsh97/asuse/releases) and stores it
+  on your own machine, under your R user data directory by default, or
+  under the `ASUSE_PATH` environment variable if you set one. Nothing
+  you do with the package uploads data anywhere.
+- The underlying ASUSE microdata is published by the Ministry of
+  Statistics and Programme Implementation (MoSPI) through the
+  [microdata.gov.in](https://microdata.gov.in/NADA/index.php/catalog/238/get-microdata)
+  portal. Review MoSPI’s own terms of use before publishing or
+  redistributing derived work, particularly if you extend this package
+  with additional survey years.
+- No function in this package requires a login, API key, or other
+  credential.
+
+## Installation
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("rahulsh97/asuse")
+# install.packages("pak")
+pak::pak("rahulsh97/asuse")
 ```
+
+## Quick start
 
 ``` r
 library(asuse)
-```
 
-Because of the datasets size, the package provides a function to
-download the datasets and create a local DuckDB database. This results
-in a CRAN-compliant package.
+# survey years currently available
+available_datasets
 
-Here is how to get the ASUSE database ready for use:
-
-``` r
+# download the tidied database (one-time; the file is large, so this is
+# not run automatically when this README is built)
 asuse_download()
+
+# path to your local copy of the database
+asuse_file_path()
 ```
 
-Check the proportion of rural and urban companies in the survey (See
-<https://microdata.gov.in/NADA/index.php/catalog/238/data-dictionary/F17?file_name=LEVEL%20-%2001(Block%201%20&%20item%201503,%201508%20of%20Block%2015>)):
+## Principal functions
+
+| Function | What it does |
+|----|----|
+| `available_datasets` | Character vector of the ASUSE survey years currently included in the database (see “What data this supports”). |
+| `asuse_download(ver = NULL)` | Downloads the tidied DuckDB database from this repository’s GitHub Releases and stores it locally. Skips the download if a matching local copy already exists for your installed DuckDB version. |
+| `asuse_file_path(dir = ...)` | Returns the local file path to the DuckDB database, without connecting to it. |
+| `asuse_delete(ask = TRUE)` | Deletes the local database directory. Prompts for confirmation unless `ask = FALSE`. |
+
+## Example: querying the database
+
+Once `asuse_download()` has run, the database is a normal DuckDB file
+you can query with `DBI` or `dplyr`. This example checks the
+proportion of rural and urban enterprises in the survey (see the
+[NADA data
+dictionary](<https://microdata.gov.in/NADA/index.php/catalog/238/data-dictionary/F17?file_name=LEVEL%20-%2001(Block%201%20&%20item%201503,%201508%20of%20Block%2015>))
+for variable codes):
 
 ``` r
 library(dplyr)
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
 library(duckdb)
-#> Loading required package: DBI
 
 con <- dbConnect(duckdb(), asuse_file_path())
 
 dbListTables(con)
-#>  [1] "2021-22-level01" "2021-22-level02" "2021-22-level03" "2021-22-level04"
-#>  [5] "2021-22-level05" "2021-22-level06" "2021-22-level07" "2021-22-level08"
-#>  [9] "2021-22-level09" "2021-22-level10" "2021-22-level11" "2021-22-level12"
-#> [13] "2021-22-level13" "2021-22-level14" "2021-22-level15" "2021-22-level16"
-#> [17] "2022-23-level01" "2022-23-level02" "2022-23-level03" "2022-23-level04"
-#> [21] "2022-23-level05" "2022-23-level06" "2022-23-level07" "2022-23-level08"
-#> [25] "2022-23-level09" "2022-23-level10" "2022-23-level11" "2022-23-level12"
-#> [29] "2022-23-level13" "2022-23-level14" "2022-23-level15" "2022-23-level16"
-#> [33] "2023-24-level01" "2023-24-level02" "2023-24-level03" "2023-24-level04"
-#> [37] "2023-24-level05" "2023-24-level06" "2023-24-level07" "2023-24-level08"
-#> [41] "2023-24-level09" "2023-24-level10" "2023-24-level11" "2023-24-level12"
-#> [45] "2023-24-level13" "2023-24-level14" "2023-24-level15" "2023-24-level16"
-
-tbl(con, "2023-24-level01") %>%
-  distinct(district) %>%
-  arrange() %>%
-  pull()
-#>  [1] "21" "17" "16" "02" "24" "70" "42" "61" "63" "46" "56" "66" "45" "36" "37"
-#> [16] "11" "13" "29" "30" "60" "48" "53" "57" "58" "41" "39" "52" "38" "05" "19"
-#> [31] "10" "27" "71" "54" "75" "67" "34" "07" "22" "18" "12" "26" "73" "47" "59"
-#> [46] "68" "74" "01" "08" "03" "25" "65" "69" "40" "51" "06" "15" "32" "31" "62"
-#> [61] "55" "72" "20" "09" "04" "64" "50" "35" "14" "28" "33" "23" "43" "44" "49"
 
 tbl(con, "2023-24-level01") %>%
   count(sector) %>%
@@ -87,100 +110,99 @@ tbl(con, "2023-24-level01") %>%
     pct = n / sum(n)
   ) %>%
   collect()
-#> Warning: Missing values are always removed in SQL aggregation functions.
-#> Use `na.rm = TRUE` to silence this warning
-#> This warning is displayed once every 8 hours.
-#> # A tibble: 2 × 3
-#>   sector      n   pct
-#>   <chr>   <dbl> <dbl>
-#> 1 Rural  283448 0.528
-#> 2 Urban  253751 0.472
 
 dbDisconnect(con, shutdown = TRUE)
 ```
 
-Create a map showing the proportion of rural companies per region:
+A second example, mapping the proportion of rural enterprises by
+region, uses the boundary file in `region-codes/`.
+
+## Map geometry
+
+The package includes a boundary layer for India’s states and union
+territories, used for mapping survey results geographically.
+`region-codes/build_india_map.R` documents how it is built, and
+`region-codes/MAP_SOURCE.md` has the full source and licence details.
 
 ``` r
 library(sf)
-#> Linking to GEOS 3.13.1, GDAL 3.11.3, PROJ 9.6.0; sf_use_s2() is TRUE
-library(stringr)
 library(ggplot2)
-
-con <- dbConnect(duckdb(), asuse_file_path())
-
-dbListTables(con)
-#>  [1] "2021-22-level01" "2021-22-level02" "2021-22-level03" "2021-22-level04"
-#>  [5] "2021-22-level05" "2021-22-level06" "2021-22-level07" "2021-22-level08"
-#>  [9] "2021-22-level09" "2021-22-level10" "2021-22-level11" "2021-22-level12"
-#> [13] "2021-22-level13" "2021-22-level14" "2021-22-level15" "2021-22-level16"
-#> [17] "2022-23-level01" "2022-23-level02" "2022-23-level03" "2022-23-level04"
-#> [21] "2022-23-level05" "2022-23-level06" "2022-23-level07" "2022-23-level08"
-#> [25] "2022-23-level09" "2022-23-level10" "2022-23-level11" "2022-23-level12"
-#> [29] "2022-23-level13" "2022-23-level14" "2022-23-level15" "2022-23-level16"
-#> [33] "2023-24-level01" "2023-24-level02" "2023-24-level03" "2023-24-level04"
-#> [37] "2023-24-level05" "2023-24-level06" "2023-24-level07" "2023-24-level08"
-#> [41] "2023-24-level09" "2023-24-level10" "2023-24-level11" "2023-24-level12"
-#> [45] "2023-24-level13" "2023-24-level14" "2023-24-level15" "2023-24-level16"
-
-# average day of manufacturing days per region
-# README_ASUSE_2324%20.pdf: the State code can be derived from the field ‘NSS-Region’ (first 2 digits) 
-mean_rural <- tbl(con, "2023-24-level01") %>%
-  mutate(
-    sector = case_when(
-      sector == 1L ~ "Rural",
-      sector == 2L ~ "Urban",
-      TRUE ~ NA_character_
-    )
-  ) %>%
-  mutate(
-    nss_region = as.integer(substr(district, 1, 2))
-  ) %>%
-  count(nss_region, sector) %>%
-  group_by(nss_region) %>%
-  mutate(pct = n / sum(n)) %>%
-  filter(sector == "Rural") %>%
-  collect()
-
-dbDisconnect(con, shutdown = TRUE)
-
-# merge data with map of India states
 
 india_states <- readRDS("region-codes/india_states_map.rds")
 
-mean_rural <- mean_rural %>%
-  mutate(nss_region = str_pad(nss_region, width = 2, side = "left", pad = "0")) %>%
-  left_join(india_states, by = c("nss_region" = "state_code"))
-
-ggplot(mean_rural) +
-  geom_sf(aes(fill = pct, geometry = geometry), colour = "grey30", size = 0.2) +
-  scale_fill_viridis_c(option = "D", begin = 0.5, end = 0.8, na.value = "grey95", name = "Avg expenditure") +
-  labs(title = "Proportion of rural enterprises per region (ASUSE)") +
-  theme_minimal() +
+ggplot(india_states) +
+  geom_sf(fill = "grey85", colour = "grey40", linewidth = 0.2) +
+  theme_minimal(base_size = 13) +
   theme(
     axis.text = element_blank(),
     axis.ticks = element_blank(),
     panel.grid = element_blank(),
-    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
-    legend.position = "top"
-  )
+    plot.title = element_text(hjust = 0.5, face = "bold")
+  ) +
+  labs(title = "States and union territories covered by this package")
 ```
 
-<img src="man/figures/README-avg_rural-1.png" width="100%" />
+<img src="man/figures/README-india_map-1.png" width="100%" />
 
-# Adding older/newer years
+Map geometry: SimpleMaps, used under CC BY 4.0; package-specific data
+and visualisation by Rahul Shukla. This is a geometry preview, not a
+statistical indicator: it confirms the boundary layer loads and spans
+the full country, including the complete northern outline and the
+island territories.
 
-Microdata:
+## Data coverage
+
+<img src="man/figures/README-data_coverage-1.png" width="100%" />
+
+This chart shows which ASUSE survey years (2021-22 through 2023-24)
+are currently included in the tidied database, taken directly from the
+package’s own `available_datasets`. It is a coverage inventory, not a
+computed enterprise indicator: state-level measures such as workers
+per establishment, enterprise productivity, or the female-owned
+establishment share require the downloaded survey database via
+`asuse_download()`, and at the time of writing this repository has no
+published GitHub Release for that function to fetch. To reproduce or
+extend this chart once real data is available, adapt
+`build_data_coverage_chart.R` to compute and map a genuine state-level
+aggregate instead of a coverage inventory.
+
+## Adding older or newer years
+
+Microdata catalogue:
 <https://microdata.gov.in/NADA/index.php/catalog/238/get-microdata>
 
-1.  Install the Nesstar Explorer (e.g. ASUSE 2023-24 includes it)
+1.  Install the Nesstar Explorer (for example, the ASUSE 2023-24
+    release includes it).
 2.  Extract the RAR files downloaded from the microdata website to
-    data-raw/202324 or what year you are adding
-3.  Export the .Nesstar file to Stata (SAV) format with “Export
-    Datasets” and the metadata with “Export DDI” using the Nesstar
-    Explorer
-4.  Update `00-tidy-data.r` and run it
-5.  Update the available datasets in `R/available_datasets.R`
-6.  Update the new RDS files in the ‘Releases’ section of the GitHub
-    repository
-7.  Regenerate the database with `asuse_delete()` and `asuse_download()`
+    `data-raw/202324`, or whichever year you are adding.
+3.  Export the `.Nesstar` file to Stata (SAV) format with “Export
+    Datasets”, and the metadata with “Export DDI”, using the Nesstar
+    Explorer.
+4.  Update `00-tidy-data.r` and run it.
+5.  Update the available datasets in `R/available_datasets.R`.
+6.  Upload the new RDS files to the “Releases” section of the GitHub
+    repository.
+7.  Regenerate the local database with `asuse_delete()` and
+    `asuse_download()`.
+
+## Relationship to the wider India data ecosystem
+
+asuse is one of a small family of R packages that tidy major Indian
+government surveys into queryable DuckDB databases using the same
+design: [asi](https://github.com/rahulsh97/asi) (Annual Survey of
+Industries, formal manufacturing) and
+[plfs](https://github.com/rahulsh97/plfs) (Periodic Labour Force
+Survey, employment and labour). For an overview of these and other
+public Indian datasets used in economic research, see
+[india-research-stack](https://github.com/rahulsh97/india-research-stack).
+
+## Contributing and issues
+
+Bug reports and questions are welcome at
+<https://github.com/rahulsh97/asuse/issues>.
+
+## Citation and licence
+
+Code and the tidying pipeline are released under CC0 1.0 Universal;
+see [LICENSE.md](LICENSE.md). The underlying ASUSE microdata remains
+subject to MoSPI’s own terms of use.
